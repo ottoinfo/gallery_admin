@@ -1,0 +1,46 @@
+@import "compass";
+@import "compass/functions";
+@import "variables";
+
+@font-face {
+  font-family: "OpenSansLight";
+  src: url("../fonts/OpenSans-Light.ttf") format("ttf");
+}
+@font-face {
+  font-family: "OpenSansBold";
+  src: url("../fonts/OpenSans-Bold.ttf") format("ttf");
+}
+
+// CLEARFIX 
+.clearfix {
+  &:before, &:after {
+    content:" ";
+    display:table;
+  }
+  &:after {
+    clear:both;
+  }
+}
+
+// BASICS
+*, html * {
+  vertical-align: middle;
+  font-weight: inherit;
+  font-family: inherit;
+  font-style: inherit;
+  font-size: 1em;
+  letter-spacing: 0;
+  @include box-sizing(border-box);
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: $font_family;
+  font-size: 16px;
+  color: $color;
+}
+
+#app {
+  margin: 20px;
+}
