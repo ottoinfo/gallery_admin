@@ -1,91 +1,112 @@
-const path = require("path");
+require("babel-polyfill")
+const webpack = require("webpack")
+const path = require("path")
 const HtmlWebpackPlugin = require("html-webpack-plugin")
+const ExtractTextPlugin = require("extract-text-webpack-plugin")
+const autoprefixer = require("autoprefixer")
 const merge = require("webpack-merge")
 const validate = require("webpack-validator")
-const config_webpack = require("./configs/webpack")
+const configEnv = require("./configs/env")
+const configWebpack = require("./configs/webpack")
 const pkg = require("./package.json")
 
 const PATHS = {
-  app: path.join(__dirname, "src"),
-  build: path.join(__dirname, "dist"),
-  hbs: [
-    path.join(__dirname, "public", "template.hbs"),
-  ],
-  files: [
-    path.join(__dirname, "public", "images"),
-  ],
+  app: [ path.join(__dirname, "src") ],
+  build: path.join(__dirname, "dist", "html"),
+  hbs: [ path.join(__dirname, "public", "template.hbs") ],
+  files: [ path.join(__dirname, "public") ],
+  fonts: [ path.join(__dirname, "public", "fonts") ],
   public: "/",
+  sass: [ path.join(__dirname, "public", "css") ],
+  sass_modules: [ path.join(__dirname, "src") ],
+  src: path.join(__dirname, "src", "index.js"),
   style: [
-    path.join(__dirname, "node_modules", "purecss"),
-    path.join(__dirname, "public", "css", "main.css"),
-  ],
-  sass: [
-    path.join(__dirname, "src", "components"),
+    path.join(__dirname, "public", "css", "style.scss"),
   ],
 }
 
-const common = {
-  entry: {
-    app: PATHS.app,
-    style: PATHS.style,
-    vendor: ["react", "react-dom", "react-router"], //Object.keys(pkg.dependencies),
-  },
-  eslint: {
-    quiet: false,
-    emitError: false,
-    failOnWarning: false,
-    failOnError: false,
-  },
-  externals: {},
-  plugins: [
-    new HtmlWebpackPlugin({
-      author: "Matthew Otto",
-      description: "Gallery Admin",
-      favicon: "public/images/favicon.jpg",
-      filename: "index.html",
-      template: "public/template.hbs",
-      title: "Admin",
-    }),
-  ],
-  resolve: {
-    root: path.resolve('./src'),
-    modulesDirectories: [ 'node_modules' ],
-    extensions: [ '', '.js', '.jsx', '.json' ],
-  },
-  sassResources: [
-    './public/css/_variables.scss',
-    './public/css/_mixins.scss',
-  ],
-}
+const vendorPackages = Object.keys(pkg.dependencies)
 
-var config
+const common = merge(
+  {
+    entry: {
+      "babel-polyfill": "babel-polyfill",
+      app: PATHS.src,
+      style: PATHS.style,
+      vendor: vendorPackages,
+    },
+    output: {
+      chunkFilename: "[hash].js",
+      filename: "[name].[hash].js",
+      path: PATHS.build,
+      publicPath: PATHS.public,
+    },
+    eslint: {
+      quiet: false,
+      emitError: false,
+      failOnWarning: false,
+      failOnError: false,
+    },
+    externals: {},
+    plugins: [
+      new webpack.DefinePlugin({
+        "process.env": {
+          NODE_ENV: configEnv.NODE_ENV,
+          API_URL: configEnv.API_URL,
+          BASE_URL: configEnv.BASE_URL,
+        },
+      }),
+      new HtmlWebpackPlugin({
+        author: "Matthew Otto",
+        description: "Gallery Admin",
+        favicon: "public/images/favicon.jpg",
+        filename: "index.html",
+        template: "public/template.hbs",
+        title: "Admin",
+      }),
+      new ExtractTextPlugin("style.[hash].css", {
+        allChunks: true,
+        disable: true, // CSS MODULES
+      }),
+    ],
+    resolve: {
+      root: path.resolve("./src"),
+      modulesDirectories: [ "node_modules" ],
+      extensions: [ "", ".js", ".jsx", ".json" ],
+    },
+    postcss: [
+      autoprefixer({ browsers: ["last 2 versions"] }),
+    ],
+    sassResources: [
+      path.join(__dirname, "public/css/_mixins.scss"),
+      path.join(__dirname, "public/css/_variables.scss"),
+      path.join(__dirname, "public/css/_resets.scss"),
+    ],
+  },
+  configWebpack.setupBabel(PATHS.app),
+  configWebpack.setupFiles(PATHS.files),
+  configWebpack.setupFonts(PATHS.fonts),
+  configWebpack.setupHBS(PATHS.hbs),
+  configWebpack.setupJSON(PATHS.app),
+  configWebpack.setupSASS(PATHS.sass),
+  configWebpack.setupSASS(PATHS.sass_modules, { module: true, resources: true })
+)
+
+let config
 // Detect how npm is run and branch based on that
 switch (process.env.npm_lifecycle_event) {
 case "build":
   config = merge(
-    {
-      output: {
-        chunkFilename: "[chunkhash].js",
-        filename: "[name].[chunkhash].js",
-        path: PATHS.build,
-        publicPath: PATHS.public,
-      },
-    },
     common,
-    config_webpack.clean(PATHS.build),
-    config_webpack.extractBundle({
+    configWebpack.clean(PATHS.build),
+    configWebpack.extractBundle({
       name: "vendor",
-      entries: ["react", "react-dom", "react-router"], //Object.keys(pkg.dependencies),
+      entries: vendorPackages,
     }),
-    config_webpack.extractCSS(PATHS.style),
-    config_webpack.purifyCSS(PATHS.app),
-    config_webpack.minify(),
-    config_webpack.setupBabel(PATHS.app),
-    config_webpack.setupFiles(PATHS.files),
-    config_webpack.setupHBS(PATHS.hbs),
-    config_webpack.setupJSON(PATHS.app),
-    config_webpack.setupSASS(PATHS.sass),
-    config_webpack.setFreeVariable(
+    configWebpack.extractCSS(PATHS.style),
+    configWebpack.purifyCSS(PATHS.app),
+    configWebpack.minify(),
+    configWebpack.setFreeVariable(
       "process.env.NODE_ENV",
       "production"
     )
@@ -97,13 +118,12 @@ default:
       devtool: "eval-source-map",
     },
     common,
-    config_webpack.setupBabel(PATHS.app),
-    config_webpack.setupCSS(PATHS.style),
-    config_webpack.setupSASS(PATHS.sass),
-    config_webpack.setupFiles(PATHS.files),
-    config_webpack.setupHBS(PATHS.hbs),
-    config_webpack.setupJSON(PATHS.app)
+    configWebpack.devServer({
+      host: process.env.HOST,
+      port: process.env.PORT,
+    }),
+    configWebpack.setupCSS(PATHS.style)
   )
 }
 
-module.exports = config
+module.exports = config // validate(config) breaks w/ sassResources

@@ -16,3 +16,10 @@
     Readme Documentation
     Built out Webpack, Break up Api and React into 2 seperate services
     Test Coverage
+
+
+FontAwesome
+-----------
+Using for icons
+Manually copied assets into public/(css && fonts)
+Updated the _variables & _paths to point to "fa/" folder and remove "?v=" version info

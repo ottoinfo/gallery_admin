@@ -1,0 +1,38 @@
+$width: 150px;
+$padding: 3px 5px;
+
+.layout {
+  position: relative;
+  width: $width;
+  background: $shade12;
+  color: $shade5;
+  padding: $padding;
+  border: $border;
+  cursor: pointer;
+  p {
+    @include flex_layout($justify: space-between);
+    i {
+      line-height: 1.4em !important;
+    }
+  }
+  ul {
+    position: absolute;
+    right: 0;
+    background: $shade12;
+    border: $border;
+    width: $width;
+    li {
+      padding: $padding;
+      + li {
+        border-top: $border;
+      }
+      &:hover {
+        background: $shade11;
+        color: $shade8;
+      }
+      p {
+
+      }
+    }
+  }
+}

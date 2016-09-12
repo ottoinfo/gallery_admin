@@ -1,20 +1,29 @@
 import React from "react"
-import { Route, IndexRoute, IndexRedirect } from "react-router"
+import { Route } from "react-router"
 
-import Layout from "./components/admin/Layout"
-// import Information from "./components/information/Information"
-import Login from "./components/admin/Login"
-import Admin from "./components/admin/Admin"
-// import Settings from "./components/settings/Settings"
-
-const NotFound = ()=>
-  (<h1>404.. This page is not found!</h1>)
+// Components
+import AppWrapper from "./wrapper"
+import Layout from "./components/layout/Layout"
+import GalleryLayout from "./components/gallery/Layout"
+import ImageLayout from "./components/image/Layout"
+import TagLayout from "./components/tag/Layout"
+import UserLayout from "./components/user/Layout"
+import Styleguide from "./components/styleguide/Styleguide"
+import Login from "./components/login/Login"
+import NotFound from "./components/404"
 
 export default (
-  <Route path="/" component={ Layout }>
-    <IndexRoute component={ Login }/>
+  <Route path="/" component={ AppWrapper }>
+    <Route path="admin" component={Layout}>
+      <Route path="galleries(/)(:id)" component={GalleryLayout} />
+      <Route path="images(/)(:id)" component={ImageLayout} />
+      <Route path="tags(/)(:id)" component={TagLayout} />
+      <Route path="users(/)(:id)" component={UserLayout} />
+    </Route>
+
+    <Route path="admin/styleguide" component={Styleguide}/>
+
     <Route path="login" component={ Login }/>
-    <Route path="signup" component={ Admin }/>
-    <Route path="*" component={ NotFound } />
+    <Route path="*" component={ NotFound }/>
   </Route>
 )

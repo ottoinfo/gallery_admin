@@ -1,0 +1,70 @@
+.layout {
+  @include flex_layout();
+  @include flex_items($margin: 0);
+}
+
+.menu {
+  width: 200px;
+  max-width: 300px;
+}
+
+.options {
+  display: block;
+}
+
+.new {
+  color: $pink;
+}
+
+.list {
+  width: 100%;
+  li {
+    width: auto;
+    margin: 10px;
+    padding: 10px;
+    cursor: pointer;
+    transition: all 0.5s ease-in-out;
+    border: $border;
+    color: $shade2;
+    &.selected {
+      background: $shade2;
+      color: $shade11;
+    }
+    &:hover {
+      background: $shade11;
+      color: $shade2;
+    }
+    i {
+      margin-right: 10px;
+    }
+    > * {
+      display: inline-block;
+    }
+  }
+}
+
+.arrows {
+  opacity: 0;
+  transition: all 0.5s ease-in-out;
+  li:hover & {
+    opacity: 1;
+  }
+}
+
+.form {
+  padding: 0 10px;
+  width: 100%;
+}
+
+.input {
+  display: inline-block;
+  position: relative;
+  margin: 0 10px;
+  i {
+    color: $shade11;
+    cursor: pointer;
+    position: absolute;
+    top: 8px;
+    right: 10px;
+  }
+}

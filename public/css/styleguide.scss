@@ -1,0 +1,62 @@
+@import "fa/font-awesome";
+@import "~purecss";
+@import "fonts";
+@import "mixins";
+@import "variables";
+@import "resets";
+
+.styleguide {
+  margin: 20px;
+  width: 100%;
+
+  .section {
+    margin: 20px 0;
+  }
+
+  .shades, .colors {
+    text-align: center;
+    > * {
+      display: inline-block;
+    }
+  }
+
+  .shades {
+    $i: 1;
+    @each $shade in $shades {
+      div:nth-child(#{$i}) {
+        .box {
+          background: #{$shade};
+        }
+        p {
+          &:after {
+            content: "shade#{$i}"
+          }
+        }
+      }
+      $i: $i + 1;
+    }
+  }
+
+  .colors {
+    $i: 1;
+    @each $color in $colors {
+      div:nth-child(#{$i}) {
+        .box {
+          background: #{$color};
+        }
+        p {
+          &:after {
+            content: "color #{$i}"
+          }
+        }
+      }
+      $i: $i + 1;
+    }
+  }
+
+  .box {
+    width: 100px;
+    height: 100px;
+    border: $border;
+  }
+}

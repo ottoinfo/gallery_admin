@@ -1,0 +1,49 @@
+$width: $left-rail;
+$padding: 3px 5px;
+
+.upload {
+  position: relative;
+  width: $width;
+  height: $footer-height;
+  background: $shade1;
+  color: $shade9;
+  padding: 0;
+  margin: 0;
+  cursor: pointer;
+}
+
+.button {
+  @include flex_layout($justify: space-between);
+  padding: 5px 20px;
+  width: 100%;
+  i {
+    color: $shade8;
+    line-height: 1.5em !important;
+  }
+}
+
+.input {
+  visibility: hidden;
+}
+
+.dropzone {
+  position: absolute;
+  bottom: $footer-height;
+  height: 150px;
+  width: $width;
+  background: $shade11;
+  color: $shade5;
+  border: $border;
+  border-left: none;
+  text-align: center;
+  padding: 20px;
+  i {
+    font-size: 8.5em;
+    line-height: 0.857em !important;
+  }
+  p {
+    border: $border;
+    border-style: dashed;
+    border-top: none;
+  }
+}

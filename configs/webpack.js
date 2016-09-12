@@ -3,10 +3,10 @@ const CleanWebpackPlugin = require("clean-webpack-plugin")
 const ExtractTextPlugin = require("extract-text-webpack-plugin")
 const PurifyCSSPlugin = require("purifycss-webpack-plugin")
 
-exports.clean = function(path) {
+exports.clean = function(folder) {
   return {
     plugins: [
-      new CleanWebpackPlugin([path], {
+      new CleanWebpackPlugin([folder], {
         root: process.cwd(),
       }),
     ],
@@ -16,40 +16,27 @@ exports.clean = function(path) {
 exports.devServer = function(options) {
   return {
     devServer: {
-      // Enable history API fallback so HTML5 History API based
-      // routing works. This is a good default that will come
-      // in handy in more complicated setups.
-      historyApiFallback: true,
-
-      // Unlike the cli flag, this doesn"t set
-      // HotModuleReplacementPlugin!
-      hot: true,
+      historyApiFallback: true, // Enable history API fallback so HTML5 History API
+      hot: true, // Unlike the cli flag, this doesn"t set HotModuleReplacementPlugin!
       inline: true,
-
-      // Display only errors to reduce the amount of output.
-      stats: "errors-only",
-
-      // Parse host and port from env to allow customization.
-      //
-      // If you use Vagrant or Cloud9, set
-      // host: options.host || "0.0.0.0"
-      //
-      // 0.0.0.0 is available to all network devices
-      // unlike default `localhost`.
+      stats: "errors-only", // Display only errors to reduce the amount of output.
       host: options.host, // Defaults to `localhost`
       port: options.port, // Defaults to 8080
-
-      proxy: {
-        // proxy api to dev server for local development
-        '/api/*': {
-          target: 'http://localhost:3000',
-          host: 'localhost:3000',
+      proxy: { // proxy api to dev server for local development
+        "/api_fails/*": {
+          "target": {
+            "host": "localhost",
+            "protocol": "http:",
+            "port": 3000,
+          },
+          ignorePath: true,
+          changeOrigin: false,
+          secure: false,
         },
       },
     },
     plugins: [
       // Enable multi-pass compilation for enhanced performance
-      // in larger projects. Good default.
       new webpack.HotModuleReplacementPlugin({
         multiStep: true,
       }),
@@ -78,7 +65,7 @@ exports.extractCSS = function(paths) {
     module: {
       loaders: [{
         include: paths,
-        loader: ExtractTextPlugin.extract("style", "css"),
+        loader: ExtractTextPlugin.extract("style", "css", "postcss"),
         test: /\.css$/,
       }],
     },
@@ -117,7 +104,7 @@ exports.purifyCSS = function(paths) {
       new PurifyCSSPlugin({
         basePath: process.cwd(),
         paths: paths,
-      })
+      }),
     ],
   }
 }
@@ -150,7 +137,7 @@ exports.setupCSS = function(paths) {
     module: {
       loaders: [{
         include: paths,
-        loaders: ["style", "css"],
+        loaders: ["style", "css", "postcss"],
         test: /\.css$/,
       }],
     },
@@ -177,10 +164,82 @@ exports.setupFiles = function(paths) {
         exclude: /node_modules/,
         include: paths,
         loader: "file",
-        test: /\.(gif|png|jpg|woff|woff2|eot|svg|ttf|mp3|mp4)$/,
+        test: /\.(gif|png|jpg|mp3|mp4)$/,
         query: {
-          limit: "8192",
-          name: "[path][name].[ext]",
+        },
+      }],
+    },
+  }
+}
+
+exports.setupFonts = function(paths, location="public/fonts/") {
+  return {
+    module: {
+      loaders: [{
+        exclude: /node_modules/,
+        include: paths,
+        loader: "file",
+        test: /\.(eot|svg|ttf|woff|woff2)$/,
+        query: {
+          name: location + "[name].[ext]",
+        },
+      }],
+    },
+  }
+}
+
+exports.setupFontsURL = function(paths, location="public/fonts/") {
+  return {
+    module: {
+      loaders: [{ 
+        exclude: /node_modules/,
+        include: paths,
+        loader: "url",
+        test: /\.svg$/,
+        query: {
+          limit: 65000,
+          mimetype: "image/svg+xml",
+          name: location + "[name].[ext]",
+        },
+      }, {
+        exclude: /node_modules/,
+        include: paths,
+        loader: "url",
+        test: /\.woff$/,
+        query: {
+          limit: 65000,
+          mimetype: "application/font-woff",
+          name: location + "[name].[ext]",
+        },
+      }, {
+        exclude: /node_modules/,
+        include: paths,
+        loader: "url",
+        test: /\.woff2$/,
+        query: {
+          limit: 65000,
+          mimetype: "application/font-woff2",
+          name: location + "[name].[ext]",
+        },
+      }, {
+        exclude: /node_modules/,
+        include: paths,
+        loader: "url",
+        test: /\.[ot]t$/, 
+        query: {
+          limit: 65000,
+          mimetype: "application/octet-stream",
+          name: location + "[name].[ext]",
+        },
+      }, {
+        exclude: /node_modules/,
+        include: paths,
+        loader: "url",
+        test: /\.eot$/,
+        query: {
+          limit: 65000,
+          mimetype: "application/vnd.ms-fontobject",
+          name: location + "[name].[ext]",
         },
       }],
     },
@@ -200,15 +259,18 @@ exports.setupJSON = function(paths) {
   }
 }
 
-exports.setupSASS = function(paths) {
+exports.setupSASS = function(paths, opts={}) { // opts include=FALSE||"PATH", module=FALSE||FALSE
   return {
     module: {
       loaders: [{
         include: paths,
-        loader: "css-loader/locals?modules&" +
-                "localIdentName=[folder]-[local]--[hash:base64:5]!" +
-                "sass?outputStyle=expanded!" +
-                "sass-resources",
+        loader: ExtractTextPlugin.extract(
+          "style",
+          "css" + (opts.module ? "?modules&importLoaders=1&localIdentName=[folder]_[name]_[local]_[hash:base64:5]" : "") + "!" +
+          "postcss!" +
+          "sass?outputStyle=expanded" + (opts.include ? ("&includePaths[]=" + opts.include) : "") + "!" +
+          (opts.resources ? "sass-resources" : "")
+        ),
         test: /\.scss$/,
       }],
     },

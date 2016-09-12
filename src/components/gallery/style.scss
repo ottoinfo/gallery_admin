@@ -1,0 +1,61 @@
+.layout {
+  @include flex_layout();
+  @include flex_items($margin: 0);
+}
+
+.menu {
+  width: $left-rail;
+}
+
+.options {
+  display: block;
+}
+
+.new {
+  color: $pink;
+}
+
+.list {
+  position: relative;
+  width: 100%;
+  height: 800px;
+}
+
+.item {
+  @include flex_layout($justify: space-between);
+  user-select: none;
+  position: absolute;
+  width: 100%;
+  height: 50px;
+  padding: 10px;
+  margin: 0 5px;
+  cursor: pointer;
+  transition: all 0.5s ease-in-out;
+  border-top: $border;
+  color: $shade2;
+  &.selected {
+    background: $shade2;
+    color: $shade11;
+  }
+  &:hover {
+    background: $shade11;
+    color: $shade2;
+  }
+  p {
+    flex-grow: 2;
+    margin: 0 10px;
+  }
+}
+
+.arrows {
+  opacity: 0;
+  transition: all 0.5s ease-in-out;
+  li:hover & {
+    opacity: 1;
+  }
+}
+
+.form {
+  margin-left: 50px;
+  width: 500px;
+}

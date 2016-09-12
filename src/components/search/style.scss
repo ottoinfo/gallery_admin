@@ -1,0 +1,23 @@
+.search {
+  position: relative;
+  display: inline-block;
+  i {
+    position: absolute;
+    top: 8px;
+    left: 10px;
+    color: $shade11;
+    &:last-child {
+      right: 10px;
+      left: inherit;
+      cursor: pointer;
+    }
+  }
+  input {
+    background: $shade12;
+    border: $border;
+    border-radius: $radius;
+    color: $shade2;
+    font-size: 0.875em;
+    padding: 5px 10px 5px 30px;
+  }
+}

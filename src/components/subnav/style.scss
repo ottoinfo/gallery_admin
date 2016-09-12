@@ -1,0 +1,76 @@
+// Sub Nav
+.subnav {
+  width: 100%;
+  @include flex_layout();
+  @include flex_items();
+  border-bottom: $border;
+  border-color: $shade3;
+  font-size: 0.857em;
+}
+
+.spacer {
+  flex-grow: 2;
+}
+
+.icons {
+  margin: 0;
+  li {
+    transition: all 0.5s ease-in-out;
+    + li {
+      border-left: $border;
+      border-color: $shade3;
+    }
+    i {
+      padding: 15px;
+    }
+    &:hover {
+      background: $shade5;
+    }
+  }
+}
+
+.icon {
+  width: 50px;
+  height: 50px;
+  display: inline-block;
+  text-align: center;
+  span {
+    text-indent: -9999px;
+    display: inline-block;
+  }
+}
+
+.notselected {
+  background: $shade2;
+  color: $shade5;
+  &:hover {
+    color: $shade8;
+  }
+}
+
+.selected {
+  background: $shade5;
+  color: $shade11;
+}
+
+.options {
+  background: $shade11;
+  color: $shade2;
+  width: 100px;
+  height: 50px;
+  flex-grow: 2;
+  margin: 0;
+}
+
+.refresh {
+  padding: 0 25px;
+}
+
+.options_layout {
+  @include flex_layout();
+  @include flex_items();
+  margin: 0 10px;
+  height: 100%;
+}
+
+// Tags
